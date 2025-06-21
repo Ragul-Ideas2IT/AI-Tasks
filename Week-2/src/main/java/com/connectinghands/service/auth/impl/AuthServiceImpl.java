@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -52,11 +53,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public String register(RegisterDto registerDto) {
-
-        // add check for email exists in database
-        if(userRepository.existsByEmail(registerDto.getEmail())){
-            throw new ApiException(HttpStatus.BAD_REQUEST, "Email is already exists!.");
+        // Check if email already exists
+        if (userRepository.existsByEmail(registerDto.getEmail())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Email already exists.");
         }
 
         User user = new User();
@@ -65,13 +66,13 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(registerDto.getEmail());
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
 
-        Set<Role> roles = new HashSet<>();
-        Role userRole = roleRepository.findByName("ROLE_USER").get();
-        roles.add(userRole);
-        user.setRoles(roles);
+        Role userRole = roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Default user role not found."));
+
+        user.setRoles(Set.of(userRole));
 
         userRepository.save(user);
 
-        return "User registered successfully!.";
+        return "User registered successfully!";
     }
 } 

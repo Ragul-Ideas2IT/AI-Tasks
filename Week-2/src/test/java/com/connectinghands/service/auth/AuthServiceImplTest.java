@@ -25,6 +25,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -84,12 +86,12 @@ public class AuthServiceImplTest {
     public void register_shouldReturnSuccessMessage_whenEmailIsNotTaken() {
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-        when(roleRepository.findByName("ROLE_USER")).thenReturn(Optional.of(role));
-        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(roleRepository.findByName("ROLE_USER")).thenReturn(Optional.of(new Role()));
 
-        String response = authService.register(registerDto);
+        String result = authService.register(registerDto);
 
-        assertEquals("User registered successfully!.", response);
+        assertEquals("User registered successfully!", result);
+        verify(userRepository, times(1)).save(any(User.class));
     }
 
     @Test
