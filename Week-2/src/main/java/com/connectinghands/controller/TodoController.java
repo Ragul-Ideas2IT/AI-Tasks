@@ -10,38 +10,52 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/todos")
+@RequestMapping("/api/todos")
 public class TodoController {
 
     @Autowired
     private TodoService todoService;
 
     @GetMapping
-    public List<TodoDto> getAllTodos() {
-        return todoService.getAllTodos();
+    public ResponseEntity<List<TodoDto>> getAllTodos() {
+        List<TodoDto> todos = todoService.getAllTodos();
+        return ResponseEntity.ok(todos);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TodoDto> getTodoById(@PathVariable Integer id) {
-        TodoDto todoDto = todoService.getTodoById(id);
-        return ResponseEntity.ok(todoDto);
+    @GetMapping("{id}")
+    public ResponseEntity<TodoDto> getTodo(@PathVariable("id") Integer todoId) {
+        TodoDto todoDto = todoService.getTodo(todoId);
+        return new ResponseEntity<>(todoDto, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<TodoDto> createTodo(@RequestBody TodoDto todoDto) {
-        TodoDto createdTodo = todoService.createTodo(todoDto);
-        return new ResponseEntity<>(createdTodo, HttpStatus.CREATED);
+    public ResponseEntity<TodoDto> addTodo(@RequestBody TodoDto todoDto) {
+        TodoDto savedTodo = todoService.addTodo(todoDto);
+        return new ResponseEntity<>(savedTodo, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<TodoDto> updateTodo(@PathVariable Integer id, @RequestBody TodoDto todoDto) {
-        TodoDto updatedTodo = todoService.updateTodo(id, todoDto);
+    @PutMapping("{id}")
+    public ResponseEntity<TodoDto> updateTodo(@RequestBody TodoDto todoDto,
+                                              @PathVariable("id") Integer todoId) {
+        TodoDto updatedTodo = todoService.updateTodo(todoDto, todoId);
         return ResponseEntity.ok(updatedTodo);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTodo(@PathVariable Integer id) {
-        todoService.deleteTodo(id);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("{id}")
+    public ResponseEntity<String> deleteTodo(@PathVariable("id") Integer todoId) {
+        todoService.deleteTodo(todoId);
+        return ResponseEntity.ok("Todo deleted successfully!.");
+    }
+
+    @PatchMapping("{id}/complete")
+    public ResponseEntity<TodoDto> completeTodo(@PathVariable("id") Integer todoId) {
+        TodoDto updatedTodo = todoService.completeTodo(todoId);
+        return ResponseEntity.ok(updatedTodo);
+    }
+
+    @PatchMapping("{id}/in-complete")
+    public ResponseEntity<TodoDto> inCompleteTodo(@PathVariable("id") Integer todoId) {
+        TodoDto updatedTodo = todoService.inCompleteTodo(todoId);
+        return ResponseEntity.ok(updatedTodo);
     }
 } 

@@ -5,37 +5,47 @@ import com.connectinghands.dto.user.LoginDto;
 import com.connectinghands.dto.user.RegisterDto;
 import com.connectinghands.security.JwtAuthenticationFilter;
 import com.connectinghands.security.JwtTokenProvider;
+import com.connectinghands.security.SecurityConfig;
 import com.connectinghands.service.auth.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AuthController.class)
+@SpringBootTest
 public class AuthControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext context;
 
     @MockBean
     private AuthService authService;
-    
-    @MockBean
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-    
-    @MockBean
-    private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @BeforeEach
+    public void setup() {
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
+    }
 
     @Test
     public void login_shouldReturnToken_whenCredentialsAreValid() throws Exception {
@@ -44,6 +54,9 @@ public class AuthControllerTest {
         loginDto.setPassword("password");
 
         String token = "test-jwt-token";
+        JwtAuthResponseDto responseDto = new JwtAuthResponseDto();
+        responseDto.setAccessToken(token);
+
         when(authService.login(any(LoginDto.class))).thenReturn(token);
 
         mockMvc.perform(post("/api/v1/auth/login")
