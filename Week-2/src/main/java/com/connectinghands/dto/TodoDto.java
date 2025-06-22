@@ -1,15 +1,18 @@
 package com.connectinghands.dto;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.time.LocalDateTime;
-
-@Data
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class TodoDto {
-    private Integer id;
+    private int id;
     private String title;
     private String description;
     private boolean completed;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Long userId;
 } 

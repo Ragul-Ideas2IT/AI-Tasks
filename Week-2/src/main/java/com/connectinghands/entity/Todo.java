@@ -21,9 +21,14 @@ public class Todo {
     @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false)
     private String description;
 
     private boolean completed;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

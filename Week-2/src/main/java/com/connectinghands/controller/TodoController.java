@@ -2,7 +2,7 @@ package com.connectinghands.controller;
 
 import com.connectinghands.dto.TodoDto;
 import com.connectinghands.service.TodoService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +11,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/todos")
+@AllArgsConstructor
 public class TodoController {
 
-    @Autowired
     private TodoService todoService;
 
     @GetMapping
@@ -35,9 +35,9 @@ public class TodoController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<TodoDto> updateTodo(@RequestBody TodoDto todoDto,
-                                              @PathVariable("id") Integer todoId) {
-        TodoDto updatedTodo = todoService.updateTodo(todoDto, todoId);
+    public ResponseEntity<TodoDto> updateTodo(@PathVariable("id") Integer todoId,
+                                              @RequestBody TodoDto todoDto) {
+        TodoDto updatedTodo = todoService.updateTodo(todoId, todoDto);
         return ResponseEntity.ok(updatedTodo);
     }
 

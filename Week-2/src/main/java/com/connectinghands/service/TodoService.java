@@ -8,7 +8,7 @@ public interface TodoService {
     TodoDto addTodo(TodoDto todoDto);
     TodoDto getTodo(Integer todoId);
     List<TodoDto> getAllTodos();
-    TodoDto updateTodo(TodoDto todoDto, Integer todoId);
+    TodoDto updateTodo(Integer todoId, TodoDto todoDto);
     void deleteTodo(Integer todoId);
     TodoDto completeTodo(Integer todoId);
     TodoDto inCompleteTodo(Integer todoId);
