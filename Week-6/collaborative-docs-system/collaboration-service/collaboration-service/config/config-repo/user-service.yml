@@ -1,0 +1,1 @@
+spring:\n  datasource:\n    url: jdbc:postgresql://postgres:5432/docdb\n    username: docuser\n    password: docpass\n

@@ -1,0 +1,35 @@
+server:
+  port: 8085
+
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            allowedHeaders: "*"
+      routes:
+        - id: user-service
+          uri: http://localhost:8080
+          predicates:
+            - Path=/api/auth/**, /api/user/**
+        - id: document-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/documents/**
+        - id: collaboration-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/collaboration/**, /ws/collaborate/**
+      default-filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 10
+            redis-rate-limiter.burstCapacity: 20
+            redis-rate-limiter.requestedTokens: 1 

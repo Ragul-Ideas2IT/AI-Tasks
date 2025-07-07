@@ -1,0 +1,84 @@
+version: '3.8'
+services:
+  user-service:
+    build: ./user-service
+    ports:
+      - "8001:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      - postgres
+      - redis
+      - config
+      - registry
+
+  document-service:
+    build: ./document-service
+    ports:
+      - "8002:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      - postgres
+      - redis
+      - config
+      - registry
+
+  collaboration-service:
+    build: ./collaboration-service
+    ports:
+      - "8003:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      - postgres
+      - redis
+      - config
+      - registry
+
+  gateway:
+    build: ./gateway
+    ports:
+      - "8000:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    depends_on:
+      - user-service
+      - document-service
+      - collaboration-service
+      - config
+      - registry
+
+  config:
+    build: ./config
+    ports:
+      - "8888:8888"
+
+  registry:
+    build: ./registry
+    ports:
+      - "8761:8761"
+
+  monitoring:
+    build: ./monitoring
+    ports:
+      - "9000:9000"
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: docuser
+      POSTGRES_PASSWORD: docpass
+      POSTGRES_DB: docdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:
